@@ -11,8 +11,10 @@ set -e;
 fetch=false
 status=false
 
+PROG=`basename "$0" | tr -d '\n'`
+
 function show_usage() {
-    echo Usage: gitstat [-f] [-s] [dir[dir...]]
+    echo Usage: $PROG [-f] [-s] [dir[dir...]]
     exit 1
 }
 
@@ -24,7 +26,7 @@ while [ ! -z "$1" ];do
         -f|--fetch)
           fetch="true"
           ;;
-        -s|--sleep)
+        -s|--status)
           status="true"
           ;;
         *)
