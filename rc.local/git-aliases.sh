@@ -71,18 +71,22 @@ export PS1="\# [\t] \u@\h \W/\$(git-branch-prompt) $ "
 PS1="\u@\$(prompt-hostname) \[\033[0;36m\]\W\[\033[0m\]\[\033[0;32m\]\$(git-branch-prompt)\[\033[0m\] \$ "
 
 function git-fetch-urls {
-    if [ $# -lt 1 ]; then
-        echo ""
-        echo "$FUNCNAME: Usage: $FUNCNAME --help|dir [dir [dir [...]]]" 1>&2
-        return
-    fi
-
     if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "help" ]; then
+        echo "$FUNCNAME: Usage: $FUNCNAME --help|[dir [dir [dir ...]]]" 1>&2
         echo "$FUNCNAME: Show the git fetch URLs for git repos in a list of directories" 1>&2
         return
     fi
 
-    for DIR in $*; do
+    # args passed in via ARGV
+    args=("$@")
+
+    # add $PWD if none
+    if [ ${#args[@]} == 0 ]; then
+        args+=($PWD)
+    fi
+
+    # show fetch for all dirs
+    for DIR in "${args[@]}"; do
         (cd $DIR > /dev/null; \
          git remote -v | \
              grep fetch |\
