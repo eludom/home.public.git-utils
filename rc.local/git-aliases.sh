@@ -4,7 +4,8 @@
 alias glm='git ls-files -m'
 alias gam='git add `git ls-files -m`'
 alias gcm='git commit -m'
-alias gs='git status'
+#alias gs='git status'
+alias gs='gitcheck -s'
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 alias gd="git diff"
 

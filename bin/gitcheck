@@ -1,20 +1,23 @@
 #! /bin/bash
-# Do a quick status (git branch -vv) on one or more git repos
+# Do various status operatons on git diretories
 #
-# Usage: gitstat [-f|-s] dir [dir...]
+# Usage: gitstat [-f] [-s|-u] dir [dir...]
 #
-# -f - Fetch first
-# -s - Short Status
+# -f     - Fetch first
+# -s     - Show short file status
+# -u     - print fetch url
+# [NONE] - no aguments, just show how many commits ahead/behind
 
 set -e; 
 
 fetch=false
 status=false
+url=false
 
 PROG=`basename "$0" | tr -d '\n'`
 
 function show_usage() {
-    echo Usage: $PROG [-f] [-s] [dir[dir...]]
+    echo Usage: $PROG [-f] [-s] [-u] [dir[dir...]]
     exit 1
 }
 
@@ -28,6 +31,9 @@ while [ ! -z "$1" ];do
           ;;
         -s|--status)
           status="true"
+          ;;
+        -u|--url)
+          url="true"
           ;;
         *)
             if [[ "$1" =~ ^- ]]; then
@@ -47,29 +53,24 @@ if [ "$ARGC" == "0" ]; then
 fi
 
 for i in $* ; do
-
-    if [ "$i" == "-f" ]; then
-        fetch=true
-        continue
-    fi
-
-    if [ "$i" == "-s" ]; then
-        status=true
-        continue
-    fi
-
     if [ "$fetch" == "true" ]; then
         git fetch
     fi
     
     \pushd $i > /dev/null;
-    echo $i;
 
-    if [ "$status" == "true" ]; then
-        git status -s
-    else
+    if [ "$url" == "true" ]; then
+        git remote -v | grep fetch  | sed 's#.*ssh#ssh#;s# (fetch)##'
+    elif [ "$status" == "true" ]; then
+        echo $i;
         git branch -vv;
+        git status -s
+        echo;
+    else
+        echo $i;        
+        git branch -vv;
+        echo;
+
     fi
-    echo;
     \popd > /dev/null;
 done
