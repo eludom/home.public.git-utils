@@ -1,9 +1,10 @@
 #! /bin/bash
 # Do various status operatons on git diretories
 #
-# Usage: gitstat [-f] [-s|-u] dir [dir...]
+# Usage: gitstat [-f] [-s|-u|-r] dir [dir...]
 #
 # -f     - Fetch first
+# -r     - Show remotes
 # -s     - Show short file status
 # -u     - print fetch url
 # [NONE] - no aguments, just show how many commits ahead/behind
@@ -13,11 +14,21 @@ set -e;
 fetch=false
 status=false
 url=false
+remotes=false
 
 PROG=`basename "$0" | tr -d '\n'`
 
 function show_usage() {
-    echo Usage: $PROG [-f] [-s] [-u] [dir[dir...]]
+    echo "Usage: $PROG [--help] [-f] [-s|-u|-r] [dir[dir...]]"
+
+    cat <<EOF
+
+  -f     - Fetch first
+  -r     - Show remotes
+  -s     - Show short file status
+  -u     - print fetch url
+  [NONE] - no aguments, just show how many commits ahead/behind
+EOF
     exit 1
 }
 
@@ -28,6 +39,9 @@ while [ ! -z "$1" ];do
           ;;
         -f|--fetch)
           fetch="true"
+          ;;
+        -r|--remotes)
+          remotes="true"
           ;;
         -s|--status)
           status="true"
@@ -61,6 +75,8 @@ for i in $* ; do
 
     if [ "$url" == "true" ]; then
         git remote -v | grep fetch  | sed 's#.*ssh#ssh#;s# (fetch)##'
+    elif [ "$remotes" == "true" ]; then
+        git remote -v
     elif [ "$status" == "true" ]; then
         echo $i;
         git branch -vv;
