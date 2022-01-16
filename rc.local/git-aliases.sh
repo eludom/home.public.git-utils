@@ -8,6 +8,7 @@ alias gcm='git commit -m'
 alias gs='gitcheck -s'
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 alias gd="git diff"
+alias grv="git remote -v"
 
 # because rcs....
 alias co="git checkout"
@@ -97,4 +98,3 @@ function git-fetch-urls {
     done
 
 }
-
