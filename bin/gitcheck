@@ -6,13 +6,16 @@
 # -f - Fetch first
 # -s - Short Status
 
-set -e; 
+set -e;
 
 fetch=false
 status=false
 
 function show_usage() {
-    echo Usage: gitstat [-f] [-s] [dir[dir...]]
+    echo Usage: gitcheck[-f] [-s] [dir[dir...]]
+    echo
+    echo "  -f|--fetch      Fetch before checking status"
+    echo "  -s|--status     Check git status"
     exit 1
 }
 
@@ -24,7 +27,7 @@ while [ ! -z "$1" ];do
         -f|--fetch)
           fetch="true"
           ;;
-        -s|--sleep)
+        -s|--status)
           status="true"
           ;;
         *)
@@ -59,7 +62,7 @@ for i in $* ; do
     if [ "$fetch" == "true" ]; then
         git fetch
     fi
-    
+
     \pushd $i > /dev/null;
     echo $i;
 
