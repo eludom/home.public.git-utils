@@ -4,9 +4,11 @@
 alias glm='git ls-files -m'
 alias gam='git add `git ls-files -m`'
 alias gcm='git commit -m'
-alias gs='git status'
+#alias gs='git status'
+alias gs='gitcheck -s'
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 alias gd="git diff"
+alias grv="git remote -v"
 
 # because rcs....
 alias co="git checkout"
@@ -69,3 +71,30 @@ export PS1="\# [\t] \u@\h \W/\$(git-branch-prompt) $ "
 # to colorize the prompt.  Are we done yet ???
 #
 PS1="\u@\$(prompt-hostname) \[\033[0;36m\]\W\[\033[0m\]\[\033[0;32m\]\$(git-branch-prompt)\[\033[0m\] \$ "
+
+function git-fetch-urls {
+    if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "help" ]; then
+        echo "$FUNCNAME: Usage: $FUNCNAME --help|[dir [dir [dir ...]]]" 1>&2
+        echo "$FUNCNAME: Show the git fetch URLs for git repos in a list of directories" 1>&2
+        return
+    fi
+
+    # args passed in via ARGV
+    args=("$@")
+
+    # add $PWD if none
+    if [ ${#args[@]} == 0 ]; then
+        args+=($PWD)
+    fi
+
+    # show fetch for all dirs
+    for DIR in "${args[@]}"; do
+        (cd $DIR > /dev/null; \
+         git remote -v | \
+             grep fetch |\
+             head -1| \
+             sed -r 's#\w+\W+##;s# +\(fetch.*##' \
+         )
+    done
+
+}
