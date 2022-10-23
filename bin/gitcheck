@@ -9,7 +9,7 @@
 # -u     - print fetch url
 # [NONE] - no aguments, just show how many commits ahead/behind
 
-set -e; 
+set -e;
 
 fetch=false
 status=false
@@ -70,7 +70,7 @@ for i in $* ; do
     if [ "$fetch" == "true" ]; then
         git fetch
     fi
-    
+
     \pushd $i > /dev/null;
 
     if [ "$url" == "true" ]; then
@@ -79,12 +79,12 @@ for i in $* ; do
         git remote -v
     elif [ "$status" == "true" ]; then
         echo $i;
-        git branch -vv;
+        git --no-pager branch -vv;
         git status -s
         echo;
     else
-        echo $i;        
-        git branch -vv;
+        echo $i;
+        git --no-pager branch -vv;
         echo;
 
     fi
