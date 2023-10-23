@@ -23,10 +23,10 @@ function show_usage() {
 
     cat <<EOF
 
-  -f     - Fetch first
-  -r     - Show remotes
-  -s     - Show short file status
-  -u     - print fetch url
+  -f|--fetch       - Fetch first
+  -r|--remotes     - Show remotes
+  -s|--status      - Show short file status
+  -u|--url         - print fetch url
   [NONE] - no aguments, just show how many commits ahead/behind
 EOF
     exit 1
