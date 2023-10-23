@@ -2,6 +2,7 @@
 
 # simple aliases
 alias glm='git ls-files -m'
+alias glf='git ls-files'
 alias gam='git add `git ls-files -m`'
 alias gcm='git commit -m'
 #alias gs='git status'
