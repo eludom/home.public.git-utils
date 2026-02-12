@@ -1,7 +1,7 @@
 #! /bin/bash
 # Do various status operatons on git diretories
 #
-# Usage: gitstat [-f] [-s|-u|-r] dir [dir...]
+# Usage: gitstat [-f] [-s|-u|-r|-t] dir [dir...]
 #
 # -f     - Fetch first
 # -r     - Show remotes
@@ -15,17 +15,19 @@ fetch=false
 status=false
 url=false
 remotes=false
+toplevel=false
 
 PROG=`basename "$0" | tr -d '\n'`
 
 function show_usage() {
-    echo "Usage: $PROG [--help] [-f] [-s|-u|-r] [dir[dir...]]"
+    echo "Usage: $PROG [--help] [-f] [-s|-u|-r|-t] [dir[dir...]]"
 
     cat <<EOF
 
   -f|--fetch       - Fetch first
   -r|--remotes     - Show remotes
   -s|--status      - Show short file status
+  -t|--toplevel    - Show repository root directory
   -u|--url         - print fetch url
   [NONE] - no aguments, just show how many commits ahead/behind
 EOF
@@ -45,6 +47,9 @@ while [ ! -z "$1" ];do
           ;;
         -s|--status)
           status="true"
+          ;;
+        -t|--toplevel)
+          toplevel="true"
           ;;
         -u|--url)
           url="true"
@@ -73,7 +78,9 @@ for i in $* ; do
 
     \pushd $i > /dev/null;
 
-    if [ "$url" == "true" ]; then
+    if [ "$toplevel" == "true" ]; then
+        git -C . rev-parse --show-toplevel
+    elif [ "$url" == "true" ]; then
         git remote -v | grep fetch  | sed 's#.*ssh#ssh#;s# (fetch)##'
     elif [ "$remotes" == "true" ]; then
         git remote -v

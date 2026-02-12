@@ -6,7 +6,6 @@ alias glf='git ls-files'
 alias gam='git add `git ls-files -m`'
 alias gcm='git commit -m'
 #alias gs='git status'
-alias gs='gitcheck -s'
 alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 alias gd="git diff"
 alias grv="git remote -v"
@@ -17,8 +16,11 @@ alias ci="git commit"
 
 # shortcuts to my gitcheck srript
 alias gc=gitcheck
+alias gs='gitcheck -s'
 alias gcs='gitcheck -s'
 alias gcf='gitcheck -f'
+alias gct='gitcheck -f'
+
 
 # Deep magic from before the dawn of time.
 #
