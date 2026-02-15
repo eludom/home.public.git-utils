@@ -1,13 +1,16 @@
 #! /bin/bash
-# Do various status operatons on git diretories
+# Do various status operations on git directories
 #
-# Usage: gitstat [-f] [-s|-u|-r|-t] dir [dir...]
+# Usage: gitcheck [-f] [-s|-u|-r|-t|-l|-o] dir [dir...]
 #
 # -f     - Fetch first
+# -l     - Show last update (commit date)
+# -o     - Output org-mode table (repo, lastupdate, url)
 # -r     - Show remotes
 # -s     - Show short file status
-# -u     - print fetch url
-# [NONE] - no aguments, just show how many commits ahead/behind
+# -t     - Show repository root directory
+# -u     - Print fetch url
+# [NONE] - no arguments, just show how many commits ahead/behind
 
 set -e;
 
@@ -16,23 +19,77 @@ status=false
 url=false
 remotes=false
 toplevel=false
+lastupdate=false
+orgtable=false
 
-PROG=`basename "$0" | tr -d '\n'`
+PROG=$(basename "$0" | tr -d '\n')
 
-function show_usage() {
-    echo "Usage: $PROG [--help] [-f] [-s|-u|-r|-t] [dir[dir...]]"
+#
+# Data retrieval functions
+#
+
+get_toplevel() {
+    git rev-parse --show-toplevel
+}
+
+get_url() {
+    local result
+    #result=$(git remote -v | grep fetch | sed 's#.*ssh#ssh#;s# (fetch)##')
+    #result=$(git remote -v | grep fetch)
+    result=$(git remote -v |head -1)
+    if [ -z "$result" ]; then
+        echo "NONE"
+    else
+        echo "$result"
+    fi
+}
+
+get_remotes() {
+    local result
+    result=$(git remote -v)
+    if [ -z "$result" ]; then
+        echo "NONE"
+    else
+        echo "$result"
+    fi
+}
+
+get_status() {
+    git status -s
+}
+
+get_branch() {
+    git --no-pager branch -vv
+}
+
+get_lastupdate() {
+    git log -1 --format="%ci"
+}
+
+#
+# Usage
+#
+
+show_usage() {
+    echo "Usage: $PROG [--help] [-f] [-s|-u|-r|-t|-l|-o] [dir[dir...]]"
 
     cat <<EOF
 
   -f|--fetch       - Fetch first
+  -l|--lastupdate  - Show last update (commit date)
+  -o|--org         - Output org-mode table (repo, lastupdate, url)
   -r|--remotes     - Show remotes
   -s|--status      - Show short file status
   -t|--toplevel    - Show repository root directory
-  -u|--url         - print fetch url
-  [NONE] - no aguments, just show how many commits ahead/behind
+  -u|--url         - Print fetch url
+  [NONE] - no arguments, just show how many commits ahead/behind
 EOF
     exit 1
 }
+
+#
+# Argument parsing
+#
 
 while [ ! -z "$1" ];do
    case "$1" in
@@ -41,6 +98,12 @@ while [ ! -z "$1" ];do
           ;;
         -f|--fetch)
           fetch="true"
+          ;;
+        -l|--lastupdate)
+          lastupdate="true"
+          ;;
+        -o|--org)
+          orgtable="true"
           ;;
         -r|--remotes)
           remotes="true"
@@ -68,7 +131,17 @@ done
 ARGC=$#
 
 if [ "$ARGC" == "0" ]; then
-    set -- `pwd` "$@" # add pwd if no args
+    set -- $(pwd) "$@" # add pwd if no args
+fi
+
+#
+# Main loop
+#
+
+# Print org table header if needed
+if [ "$orgtable" == "true" ]; then
+    echo "| Repo | Last Update | URL |"
+    echo "|------|-------------|-----|"
 fi
 
 for i in $* ; do
@@ -78,22 +151,28 @@ for i in $* ; do
 
     \pushd $i > /dev/null;
 
-    if [ "$toplevel" == "true" ]; then
-        git -C . rev-parse --show-toplevel
+    if [ "$orgtable" == "true" ]; then
+        update=$(get_lastupdate)
+        remote=$(get_url)
+        echo "| $i | $update | $remote |"
+    elif [ "$toplevel" == "true" ]; then
+        get_toplevel
     elif [ "$url" == "true" ]; then
-        git remote -v | grep fetch  | sed 's#.*ssh#ssh#;s# (fetch)##'
+        get_url
     elif [ "$remotes" == "true" ]; then
-        git remote -v
+        get_remotes
+    elif [ "$lastupdate" == "true" ]; then
+        get_lastupdate
     elif [ "$status" == "true" ]; then
         echo $i;
-        git --no-pager branch -vv;
-        git status -s
+        get_branch
+        get_status
         echo;
     else
         echo $i;
-        git --no-pager branch -vv;
+        get_branch
         echo;
-
     fi
+
     \popd > /dev/null;
 done
